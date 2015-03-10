@@ -75,57 +75,99 @@ end
 
 Plotly.signin("arakitin", "j9zjom7mnc")
 
-tri_meta = readcsv("/Users/arakitin/Downloads/v2_verification_sifs_w_results-1.csv")
+tri_meta = readcsv("/Users/macbook/Downloads/v2_verification_sifs_w_results.csv")
+v2ver_meta = readcsv("/Users/macbook/Downloads/singleton_meta.csv")
+v2ver = [
+  "meta" => [
+    "" => v2ver_meta,
+    "NormalSample" => v2ver_meta,
+    "Trisomy13" => v2ver_meta,
+    "Trisomy18" => v2ver_meta,
+    "Trisomy21" => v2ver_meta,
+    "Triploidy_Twins" => v2ver_meta,
+    "Egg_donor" => v2ver_meta,
+    "MonosomyX" => v2ver_meta
+    ],
+  "" => Int64[],
+  "NormalSample" => Int64[],
+  "Trisomy13" => Int64[],
+  "Trisomy18" => Int64[],
+  "Trisomy21" => Int64[],
+  "Triploidy_Twins" => Int64[],
+  "Egg_donor" => Int64[],
+  "MonosomyX" => Int64[]
+]
 
-v2ver_meta = readcsv("/Users/arakitin/Downloads/singleton_meta.csv")
-
-v2ver = Int64[]
-v2ver_data = readcsv("/Users/arakitin/Downloads/singleton_data.csv")
+v2ver_data = readcsv("/Users/macbook/Downloads/singleton_data_1e-4.csv")
 for i = 2:size(v2ver_data, 1)
-  cfe13_2 = v2ver_data[i, find(v2ver_data[1,:] .== " cfe13_2 ")]
-  cfe18_2 = v2ver_data[i, find(v2ver_data[1,:] .== " cfe18_2 ")]
-  cfe21_2 = v2ver_data[i, find(v2ver_data[1,:] .== " cfe21_2 ")]
-  #if max(cfe13_2, cfe18_2, cfe21_2) > 0.001
-  push!(v2ver, v2ver_data[i, find(v2ver_data[1,:] .== "sif")][1])
-  #end
+  sif = v2ver_data[i, find(v2ver_data[1,:] .== "sif")][1]
+  review = tri_meta[find(tri_meta[:,find(tri_meta[1,:] .== "sif_id")] .== sif), find(tri_meta[1,:] .== "review_result")]
+  if size(review,1)==1 && review[1][1:7] != "NO_CALL"
+    push!(v2ver[tri_meta[find(tri_meta[:,find(tri_meta[1,:] .== "sif_id")] .== sif), find(tri_meta[1,:] .== "true_calls")][1]], sif)
+  end
 end
 
-twins_meta = readcsv("/Users/arakitin/Downloads/twins_meta.csv")
+twins = [
+  "meta" => Dict(),
+  "Non-Ident-Commercial-500" => Int64[],
+  "Ident-Commercial-500" => Int64[],
+  "Non-Ident-Additional-160" => Int64[],
+  "Ident-Additional-160" => Int64[],
+  "Non-Ident-Recent-50" => Int64[],
+  "Ident-Recent-50" => Int64[]
+  ]
 
-non_identical_twins = Int64[]
-identical_twins = Int64[]
-twins_data = readcsv("/Users/arakitin/Downloads/twins_data.csv")
+twins["meta"]["Non-Ident-Commercial-500"] = readcsv("/Users/macbook/Downloads/twins_meta.csv")
+twins["meta"]["Ident-Commercial-500"] = readcsv("/Users/macbook/Downloads/twins_meta.csv")
+twins_data = readcsv("/Users/macbook/Downloads/twins_data (1).csv")
 for i = 2:size(twins_data, 1)
   cfe13_2 = twins_data[i, find(twins_data[1,:] .== " cfe13_2 ")]
   cfe18_2 = twins_data[i, find(twins_data[1,:] .== " cfe18_2 ")]
   cfe21_2 = twins_data[i, find(twins_data[1,:] .== " cfe21_2 ")]
   if max(cfe13_2[1], cfe18_2[1], cfe21_2[1]) > 0.001
-    push!(non_identical_twins, twins_data[i, find(twins_data[1,:] .== "sif")][1])
+    push!(twins["Non-Ident-Commercial-500"], twins_data[i, find(twins_data[1,:] .== "sif")][1])
   else
-    push!(identical_twins, twins_data[i, find(twins_data[1,:] .== "sif")][1])
+    push!(twins["Ident-Commercial-500"], twins_data[i, find(twins_data[1,:] .== "sif")][1])
   end
 end
 
-for zzz in [1 2 3]
-
-  if zzz==1
-    list = non_identical_twins
-    list_meta = twins_meta
-    what = "non-identical-twins"
-  elseif zzz==2
-    list = identical_twins
-    list_meta = twins_meta
-    what = "identical-twins"
-  elseif zzz==3
-    list = v2ver
-    list_meta = v2ver_meta
-    what = "v2ver"
+twins["meta"]["Non-Ident-Additional-160"] = readcsv("/Users/macbook/Downloads/twins_meta_1.csv")
+twins["meta"]["Ident-Additional-160"] = readcsv("/Users/macbook/Downloads/twins_meta_1.csv")
+twins_data = readcsv("/Users/macbook/Downloads/twins_data_1.csv")
+for i = 2:size(twins_data, 1)
+  cfe13_2 = twins_data[i, find(twins_data[1,:] .== " cfe13_2 ")]
+  cfe18_2 = twins_data[i, find(twins_data[1,:] .== " cfe18_2 ")]
+  cfe21_2 = twins_data[i, find(twins_data[1,:] .== " cfe21_2 ")]
+  if max(cfe13_2[1], cfe18_2[1], cfe21_2[1]) > 0.001
+    push!(twins["Non-Ident-Additional-160"], twins_data[i, find(twins_data[1,:] .== "sif")][1])
+  else
+    push!(twins["Ident-Additional-160"], twins_data[i, find(twins_data[1,:] .== "sif")][1])
   end
+end
 
-  len = length(list)
+twins["meta"]["Non-Ident-Recent-50"] = readcsv("/Users/macbook/Downloads/new_twins_meta.csv")
+twins["meta"]["Ident-Recent-50"] = readcsv("/Users/macbook/Downloads/new_twins_meta.csv")
+twins_data = readcsv("/Users/macbook/Downloads/new_twins_data.csv")
+for i = 2:size(twins_data, 1)
+  cfe13_2 = twins_data[i, find(twins_data[1,:] .== " cfe13_2 ")]
+  cfe18_2 = twins_data[i, find(twins_data[1,:] .== " cfe18_2 ")]
+  cfe21_2 = twins_data[i, find(twins_data[1,:] .== " cfe21_2 ")]
+  if max(cfe13_2[1], cfe18_2[1], cfe21_2[1]) > 0.001
+    push!(twins["Non-Ident-Recent-50"], twins_data[i, find(twins_data[1,:] .== "sif")][1])
+  else
+    push!(twins["Ident-Recent-50"], twins_data[i, find(twins_data[1,:] .== "sif")][1])
+  end
+end
+
+for list in [twins v2ver]
+
+  for what in setdiff(keys(list), "meta")
+
+  len = length(list[what])
+
+  println("Doing "*what*" of length = "*string(len))
 
   statCFE = fill(NaN, len)
-  nocall  = fill(NaN, len)
 
   MaxLikeA13 = fill(NaN, len)
   MaxLikeB13 = fill(NaN, len)
@@ -154,10 +196,17 @@ for zzz in [1 2 3]
   cfe2fromMaxLikeB21 = fill(NaN, len)
 
   cc = 0
-  for sif in list
+  for sif in list[what]
     cc += 1
 
-    print(string(sif)*"   "*string(cc/0.01/length(list))*" %\n");
+    print(string(sif)*"   "*string(cc/0.01/length(list[what]))*" %\n");
+
+    if size(find(list["meta"][what][:,1] .== sif),1)==0
+      println("Cannot find sif "*sif*" in meta for "*what)
+      continue
+    end
+
+    statCFE[cc] = list["meta"][what][find(list["meta"][what][:,1] .== sif), find(list["meta"][what][1,:] .== " statCFE")][1]
 
     resp = Requests.get("http://stats-dev:8080/stats/rest//utility/"*string(sif)*"/cfe/likelihoods")
 
@@ -177,8 +226,6 @@ for zzz in [1 2 3]
     str = replace(str, "\n", " ")
     str = replace(str, ",", " ")
     eval(parse(str))
-
-    statCFE[cc] = list_meta[find(list_meta[:,1] .== sif), find(list_meta[1,:] .== " statCFE")][1]
 
     (MaxLikeA13[cc], cfe1fromMaxLikeA13[cc], cfe2fromMaxLikeA13[cc]) = getInnerMaximum(chr13[:,3:end])
     (MaxLikeB13[cc], cfe1fromMaxLikeB13[cc], cfe2fromMaxLikeB13[cc]) = getInnerOrBoundaryMaximum(chr13[:,1:4])
@@ -209,13 +256,6 @@ for zzz in [1 2 3]
     #  print("Double-peak diff "*string(MaxLikeA21[end] - MaxLikeB21[end])*" in sif "*string(sif)*", chr21 ")
     #  println("CFE = ", statCFE[end])
     #end
-
-    review = tri_meta[find(tri_meta[:,find(tri_meta[1,:] .== "sif_id")] .== sif), find(tri_meta[1,:] .== "review_result")]
-    if (size(review,1)==1)
-      nocall[cc] = (review[1][1:7] == "NO_CALL")
-    else
-      nocall[cc] = true # Assuming no-call if not-known
-    end
   end
 
   for c in ["13" "18" "21"]
@@ -537,10 +577,9 @@ for zzz in [1 2 3]
 
     write(fp, string(size(~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])))*"\n")
     write(fp, string(statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.15)*"\n")
-    if(zzz==3)
-      write(fp, string(!nocall[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])])*"\n")
-      write(fp, string(list[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c]) & statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.05 & !nocall[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]])*"\n")
-    end
+
+    write(fp, string(list[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c]) & statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.05])*"\n")
+
     close(fp)
 
   end
@@ -592,7 +631,7 @@ for zzz in [1 2 3]
 
   response = Plotly.plot(data, ["layout" => layout, "filename" => what*"-chrAll-diff-vsCFE", "fileopt" => "overwrite"])
 
-
+  end
 end
 
 
