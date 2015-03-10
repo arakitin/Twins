@@ -106,7 +106,7 @@ for i = 2:size(twins_data, 1)
   end
 end
 
-for zzz in [1]
+for zzz in [1 2 3]
 
   if zzz==1
     list = non_identical_twins
@@ -529,14 +529,19 @@ for zzz in [1]
 
     response = Plotly.plot(data, ["layout" => layout, "filename" => what*"-chr"*c*"-4CFEvsCFE-lower-peak", "fileopt" => "overwrite"])
 
-    println("chr"*c)
-    println(size(MaxLikeA[c][isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]))
-    println(size(MaxLikeB[c][isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]))
+    fp = open("results.txt", "a") # Home directory
+    write(fp, what*"-chr"*c*"\n")
 
-    println(~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c]))
-    println(statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.05)
-    println(!nocall[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])])
-    println(list[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c]) & statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.05 & !nocall[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]])
+    write(fp, string(size(MaxLikeA[c][isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]))*"\n")
+    write(fp, string(size(MaxLikeB[c][isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]))*"\n")
+
+    write(fp, string(size(~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])))*"\n")
+    write(fp, string(statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.15)*"\n")
+    if(zzz==3)
+      write(fp, string(!nocall[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])])*"\n")
+      write(fp, string(list[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c]) & statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.05 & !nocall[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]])*"\n")
+    end
+    close(fp)
 
   end
 
