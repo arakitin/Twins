@@ -575,10 +575,7 @@ for list in [twins v2ver]
     write(fp, string(size(MaxLikeA[c][isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]))*"\n")
     write(fp, string(size(MaxLikeB[c][isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])]))*"\n")
 
-    write(fp, string(size(~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])))*"\n")
-    write(fp, string(statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.15)*"\n")
-
-    write(fp, string(list[what][~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c]) & statCFE[~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c])].<0.05])*"\n")
+    write(fp, string(list[what][~isnan(MaxLikeA[c]) & isnan(MaxLikeB[c]) & (statCFE.<0.05)])*"\n")
 
     close(fp)
 
