@@ -161,7 +161,7 @@ end
 
 for list in [twins v2ver]
 
-  for what in setdiff(keys(list), "meta")
+  for what in setdiff(keys(list), ["meta"])
 
   len = length(list[what])
 
